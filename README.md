@@ -3,6 +3,8 @@
 ## Install caffe : 
  https://github.com/BVLC/caffe/
  
+ Add the files in src_caffe in the base of your caffe directory (code fore the weighted loss)
+ 
  ## Train Your network with the labelled data
  
  You have to adapt the paths and the parameters in config_train.py for your application and start the training with :
