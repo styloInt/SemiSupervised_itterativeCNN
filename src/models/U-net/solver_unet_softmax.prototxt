@@ -1,0 +1,21 @@
+net: "/home/atemmar/Documents/Data/RV_Segmentation_volume/src/models/U-net/unet.prototxt"
+
+test_iter: 25
+test_interval: 500
+max_iter: 80000
+
+
+base_lr: 1e-8
+display: 20
+lr_policy: "fixed"
+gamma: 0.1
+momentum: 0.99
+weight_decay: 0.0005
+stepsize: 9000
+snapshot: 2000
+snapshot_prefix: "/home/atemmar/Documents/Data/RV_Segmentation_volume/src/models_pretrained/U-net_noNorm/train_unet_rv_softmax_vp"
+solver_mode: GPU
+test_initialization: true
+average_loss: 20
+iter_size: 1
+type: "Adam"
