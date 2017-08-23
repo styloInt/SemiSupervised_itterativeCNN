@@ -182,7 +182,6 @@ def preprocessing_im(im):
     if len(im.shape) > 2:
         im = im[:,:,0]
         im = im.astype(np.float)
-        im = im
 
     # We want the shape to be divisble by 8 for the network(because of pooling layer - upsampling), we add zero padding
     if im.shape[0] % 8 != 0:
@@ -207,7 +206,8 @@ def preprocessing_label(label):
 
     return label
 
-
+def get_patient_num(basename):
+    return re.search('P(.+?).nii', basename).group(1)
 
 def compute_dice_dataset_net(dataset, gts, net_deploy):
     dices = []
@@ -275,7 +275,7 @@ def load_dataset(dataset_filename, rep_dataset, readGT=True):
             nb_slices = gt_data.shape[2]
 
         basename = os.path.basename(inputs_name)
-        patientNum = re.search('P(.+?).nii', basename).group(1)
+        patientNum = get_patient_num(basename)
 
         size_im = preprocessing_im(image_data[:,:,0]).shape
 

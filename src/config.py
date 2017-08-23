@@ -1,9 +1,19 @@
 import sys
 import os
+
+# Levels of output caffe
+# 0 - debug
+# 1 - info (still a LOT of outputs)
+# 2 - warnings
+# 3 - errors
+os.environ['GLOG_minloglevel'] = '2' 
+
+
 path_caffe = '/home/atemmar/caffe/';
 sys.path.insert(0, path_caffe + '/python')
 import caffe
 
+# Thoses parameters has to be given in argments
 k = int(sys.argv[1]) # Number of itteration
 alpha_fg = float(sys.argv[2]) # Weight loss for the foreground predicted labels
 alpha_bg = float(sys.argv[3]) # Weight loss for the background predicted labels
@@ -12,8 +22,8 @@ alpha_bg = float(sys.argv[3]) # Weight loss for the background predicted labels
 # The different paths we need
 rep_dataset = "/home/atemmar/Documents/Data/RV_Segmentation_volume/"
 
-orginal_net = rep_dataset + "/src/models/U-net/unet.prototxt" # The network you used for the training
-original_solver_name = rep_dataset + "/src/models/U-net/solver_unet_softmax_iter.prototxt" # The solver you used for the training.
+orginal_net_name = rep_dataset + "/src/models/U-net/unet.prototxt" # The network you used for the training
+original_solver_name = rep_dataset + "/src/models/U-net/solver_unet_softmax.prototxt" # The solver you used for the training.
 
 original_train_filenames = rep_dataset + "train.txt"
 unlab_filename = rep_dataset + 'unlab.txt'
@@ -27,7 +37,7 @@ number_epoch = 10 # Number of epochs you want to do
 increment = 0 # if you to increment alpha_fg et alpha_bg after each itteration
 
 # Graphcut parameter. Change depending on the dataset
-postProc = "graphcut3D" # postProcessing you want to use
+postProc = "graphcut3D" # postProcessing you want to use : graphcut3D, graphcut2D, noPost
 sigma = 0.04
 lamda = 0.05
 pWeightMax=0.95
@@ -40,14 +50,5 @@ if postProc == "graphcut3D" or postProc=="graphcut2D":
 prefix_snapshot = rep_dataset + "/src/models_pretrained/U-net_iter_vnoNorm/train_unet_spine_softmax_" + suffixe+"_iter" # SnapShot prefix to train the pretrained model
 dice_saveUnlab_filename = rep_dataset + "diceResults/dicesResuls_unlab_" + suffixe + ".txt" # Save the dice result for the unlabelled dataset if you have the ground truth
 dice_saveTest_filename = rep_dataset + "diceResults/dicesResuls_test_" + suffixe + ".txt" # Save the dice result for the test set.
-
-
-# Levels of output caffe
-# 0 - debug
-# 1 - info (still a LOT of outputs)
-# 2 - warnings
-# 3 - errors
-os.environ['GLOG_minloglevel'] = '2' 
-
 
 

@@ -21,7 +21,11 @@ def getValueFromSolver(solver_name, param):
 
 
 nbItterationDone = 0
+nbItterTest = int(getValueFromSolver(solver_name, "test_interval"))
+snapshotPrefix = getValueFromSolver(solver_name, "snapshot_prefix")
+createDirectoryPath(snapshotPrefix)
 
+mri3D, gt3D = load_dataset(filenames_validation, rep_dataset)
 
 solver = caffe.SGDSolver(solver_name)
 if usePretrainedModel == 1:
@@ -31,21 +35,17 @@ if usePretrainedModel == 2:
 	solver.net.copy_from(pretrainedModel)
 
 
-nbItterTest = int(getValueFromSolver(solver_name, "test_interval"))
-snapshotPrefix = getValueFromSolver(solver_name, "snapshot_prefix")
-
-
-mri3D, gt3D = load_dataset(filenames_validation, rep_dataset)
-
-
-print ("Begenning of training for {} itterations...".format(nb_itteration))
-print ("Dice will be computer on the validation set every {} itterations...".format(nbItterTest))
+print ("Training for {} itterations...".format(nb_itteration))
+print ("Dice will be computed on the validation set every {} itterations...".format(nbItterTest))
 print ("Starting at itteration {}".format(nbItterationDone))
-for i in range(nb_itteration/nbItterTest):
+for i in range(int(nb_itteration/nbItterTest)):
+	start_time = time.time()
 	solver.step(nbItterTest)
+	print ("\t {} itterations done in {} seconde".format(nbItterTest, (time.time() - start_time)))
 	nbItterationDone += nbItterTest
 
 	weight_file = snapshotPrefix + "_iter_" + str(nbItterationDone) + ".caffemodel"
+	solver = None
 
 	net_deploy = caffe.Net(net_deploy_name,      # defines the structure of the model
 	                weight_file, caffe.TEST)
@@ -60,7 +60,8 @@ for i in range(nb_itteration/nbItterTest):
 		dice[patientNum] = np.mean(compute_dice_dataset(gt3D[patientNum], hm3D[patientNum].argmax(2), countBgImgs=True))
 	net_deploy = None # free the memory
 
-
+	solver = caffe.SGDSolver(solver_name)
+	solver.restore(weight_file.replace("caffemodel", "solverstate"))
 	print ("After {} itterations, Dice on validation set : {}".format(nbItterationDone, np.mean(dice.values())))
 
 

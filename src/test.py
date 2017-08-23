@@ -20,7 +20,7 @@ parser.add_argument('-d', '--directory',
             help="directory where to save the results")
 
 args = parser.parse_args()
-filenames = args.files
+filenames_test = args.files
 directorySave = args.directorySave
 rep_dataset = args.rep_dataset
 
@@ -35,7 +35,7 @@ net_deploy = caffe.Net(net_deploy_name,      # defines the structure of the mode
 
 hm3D = {}
 dice = []
-file_dataset = open(filenames)
+file_dataset = open(filenames_test)
 for patientfile in file_dataset.read().splitlines():
 	split_line = patientfile.split("\t")
 	inputs_name = split_line[0]
@@ -45,7 +45,6 @@ for patientfile in file_dataset.read().splitlines():
 	nb_slices = gt_data.shape[2]
 
 	basename = os.path.basename(inputs_name)
-	print ("Prediction for : ", basename)
 
 	size_im = preprocessing_im(image_data[:,:,0]).shape
 
@@ -73,4 +72,4 @@ net_deploy = None # free the memory
 file_dataset.close()
 
 
-print ("Mean Dice on the test set : {}".format(nbItterationDone, np.mean(dice)))
+print ("Mean Dice on the test set : {}".format(np.mean(dice)))
