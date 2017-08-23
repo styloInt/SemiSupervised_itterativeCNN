@@ -5,7 +5,7 @@ This work was done during the internship I did for my master thesis at Livia lab
 ## Install caffe : 
  https://github.com/BVLC/caffe/
  
- Add the files in src_caffe in the base of your caffe directory (it's the code for the weighted loss) and build them using the "make" command.
+ Add the files in modif_caffe in the base of your caffe directory (it's the code for the weighted loss) and build them using the "make" command.
  
  ## Train Your network with the labelled data
  
