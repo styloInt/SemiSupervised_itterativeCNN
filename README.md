@@ -9,7 +9,7 @@ This work was done during the internship I did for my master thesis at Livia lab
  
  ## Train Your network with the labelled data
  
- You have to adapt the paths and the parameters in config_train.py for your application and start the training with :
+ You have to adapt the paths and the parameters in config_train.py for your application. Also if you want to do a specific preprocessing, you can do it in preprocessing_im() and preprocessing_label() (in the file utils_dataRV) and start the training with :
  ```
  python train.py
  ```
