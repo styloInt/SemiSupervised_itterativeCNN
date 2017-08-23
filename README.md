@@ -2,6 +2,8 @@
 
 This work was done during the internship I did for my master thesis at Livia laboratory. You can find my report here : 
 
+The goal of this project was to use unlabelled data in order to introduce new knoledgen in the CNN and then improve the segmentation
+
 ## Install caffe : 
  https://github.com/BVLC/caffe/
  
