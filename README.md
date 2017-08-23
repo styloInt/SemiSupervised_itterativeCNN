@@ -1,5 +1,7 @@
 # SemiSupervised/itterativeCNN
 
+This work was done during the internship I did for my master thesis at Livia laboratory. You can find my report here : 
+
 ## Install caffe : 
  https://github.com/BVLC/caffe/
  
