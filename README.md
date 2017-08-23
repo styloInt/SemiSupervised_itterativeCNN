@@ -26,8 +26,8 @@
  
 To start the itterative algorithm, you have to do :
 
-'''
+```
 python train_loop.py 8000 0.4 0.1
-'''
+```
 
 if you want to do 8000 cnn itterations and use a foreground loss of 0.4 and background loss of 0.1
