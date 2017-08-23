@@ -45,6 +45,29 @@ def elastic_transform(image, alpha, sigma, alpha_affine, random_state=None):
 
     return map_coordinates(image, indices, order=1, mode='reflect').reshape(shape)
 
+def data_augmentation(im, label):
+    rotatation_angle = [-20, -10, 0, 10, 20]
+    translate_x = [-15, -10, 0, 10, 15]
+    translate_y = [-15, -10, 0, 10, 15]
+
+    angle = random.choice(rotatation_angle)
+    tx = random.choice(translate_x)
+    ty = random.choice(translate_y)
+
+    rows, cols = im.shape
+    M_rotate = cv2.getRotationMatrix2D((cols/2,rows/2),angle,1)
+    
+    M_translate = np.float32([[1,0,tx],[0,1,ty]])
+    im = cv2.warpAffine(im, M_translate,(cols,rows))
+    label = cv2.warpAffine(label,M_translate,(cols,rows))
+    
+    im = cv2.warpAffine(im,M_rotate,(cols,rows))
+    label = cv2.warpAffine(label, M_rotate,(cols,rows))
+
+    return im, label
+
+
+
 
 class RV_layer(caffe.Layer):
     """
@@ -88,6 +111,7 @@ class RV_layer(caffe.Layer):
         self.mri3D = {}
         self.gt3D = {}
         self.weights = {}
+        self.dataAugmenation = {}
         for ind, patientfile in enumerate(self.indices):
             split_line = patientfile.split("\t")
             inputs_name = split_line[0]
@@ -110,8 +134,10 @@ class RV_layer(caffe.Layer):
 
             if weight_name == None:
                 self.weights[ind] = np.ones((size_im[0], size_im[1], gt_data.shape[2]))
+                self.dataAugmenation[ind] = True
             else:
                 self.weights[ind] = np.load('{}/{}'.format(self.rep, weight_name))
+                self.dataAugmenation[ind] = False
 
             for i in range(gt_data.shape[2]):
                 self.mri3D[ind][:,:,i] = preprocessing_im(image_data[:,:,i])
@@ -132,13 +158,14 @@ class RV_layer(caffe.Layer):
         self.label = self.load_label(self.idx, self.indSlice)
         self.weight = self.weights[self.idx][:,:,self.indSlice]
 
-        if self.elasticTransform:
-            im_merge = np.concatenate((self.data[...,None], self.label[...,None]), axis=2)
-            # Apply transformation on image
-            im_merge_t = elastic_transform(im_merge, im_merge.shape[1] * 2, im_merge.shape[1] * 0.08, im_merge.shape[1] * 0.08, random_state=None)
-            # Split image and mask
-            self.data = im_merge_t[...,0]
-            self.label = im_merge_t[...,1]
+        if self.elasticTransform and self.dataAugmenation[self.idx]:
+            # im_merge = np.concatenate((self.data[...,None], self.label[...,None]), axis=2)
+            # # Apply transformation on image
+            # im_merge_t = elastic_transform(im_merge, im_merge.shape[1] * 2, im_merge.shape[1] * 0.08, im_merge.shape[1] * 0.08, random_state=None)
+            # # Split image and mask
+            # self.data = im_merge_t[...,0]
+            # self.label = im_merge_t[...,1]
+            self.data, self.label = data_augmentation(self.data, self.label)
 
         # reshape tops to fit (leading 1 is for batch dimension)
         top[0].reshape(1,1,*self.data.shape)
