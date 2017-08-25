@@ -11,7 +11,7 @@ The goal of this project was to use unlabelled data in order to introduce new kn
  
  ## Train Your network with the labelled data
  
- You have to adapt the paths and the parameters in config_train.py for your application. Also if you want to do a specific preprocessing, you can do it in preprocessing_im() and preprocessing_label() (in the file utils_dataRV) and start the training with :
+ Once you have your solver and network defined, you have to adapt the paths and the parameters in config_train.py for your application. Also if you want to do a specific preprocessing, you can do it in preprocessing_im() and preprocessing_label() (in the file utils_dataRV) and start the training with :
  ```
  python train.py
  ```
