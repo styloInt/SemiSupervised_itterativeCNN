@@ -1,6 +1,8 @@
 # SemiSupervised/itterativeCNN
 
-This work was done during the internship I did for my master thesis at Livia laboratory. You can find my report here : 
+This work was done during the internship I did for my master thesis at Livia laboratory (ETS, Montreal). You can find my report here : 
+
+The goal of this project was to use unlabelled data in order to introduce new knowledge in the CNN and then improve the segmentation
 
 ## Install caffe : 
  https://github.com/BVLC/caffe/
@@ -9,7 +11,7 @@ This work was done during the internship I did for my master thesis at Livia lab
  
  ## Train Your network with the labelled data
  
- You have to adapt the paths and the parameters in config_train.py for your application. Also if you want to do a specific preprocessing, you can do it in preprocessing_im() and preprocessing_label() (in the file utils_dataRV) and start the training with :
+ Once you have your solver and network defined, you have to adapt the paths and the parameters in config_train.py for your application. Also if you want to do a specific preprocessing, you can do it in preprocessing_im() and preprocessing_label() (in the file utils_dataRV) and start the training with :
  ```
  python train.py
  ```
@@ -33,3 +35,6 @@ python train_loop.py 8000 0.4 0.1
 ```
 
 if you want to do 8000 cnn itterations and use a foreground loss of 0.4 and background loss of 0.1
+
+# Contact
+abdelhadi.temmar@gmail.com
