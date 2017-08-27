@@ -105,60 +105,40 @@ class RV_layer(caffe.Layer):
         self.indices = open(listFiles, 'r').read().splitlines()
         self.idx = 0
 
-         # LOAD the data. Here it's possible to do that because we have a small dataset which fit in the ram memory (I had 32 Gb ram availaible in my computer). 
-         # If it doesnt fit , it's better to use LMDB file or load an image at each itteration
+        # randomization: seed and pick
+        if self.random:
+            random.seed(self.seed)
+            self.idx = np.random.choice(self.indices)
+            split_line = self.idx.split("\t")
+            self.mri3D , _ = load(self.rep + "/" + split_line[0])
+            self.indSlice = 0
 
-        self.mri3D = {}
-        self.gt3D = {}
-        self.weights = {}
-        self.dataAugmenation = {}
-        for ind, patientfile in enumerate(self.indices):
-            split_line = patientfile.split("\t")
-            inputs_name = split_line[0]
-            output_name = split_line[1]
+
+            if ".npy" in split_line[1]:
+                self.gt_data = np.load('{}/{}'.format(self.rep, split_line[1]))
+            else:
+                self.gt_data, _ = load(self.rep + "/" + split_line[1])
+
+            self.size_im = self.mri3D.shape
             weight_name = None
             if len(split_line) > 2: # weight file specified
                 weight_name = split_line[2]
 
-            image_data, _ = load(self.rep + "/" + inputs_name)
-            if ".npy" in output_name:
-                gt_data = np.load('{}/{}'.format(self.rep, output_name))
-                gt_data = gt_data[:image_data.shape[0], :image_data.shape[1], :]
-            else:
-                gt_data, _ = load(self.rep + "/" + output_name)
-
-            size_im = preprocessing_im(image_data[:,:,0]).shape
-
-            self.mri3D[ind] = np.zeros((size_im[0], size_im[1], gt_data.shape[2]))
-            self.gt3D[ind] = np.zeros((size_im[0], size_im[1], gt_data.shape[2]))
-
             if weight_name == None:
-                self.weights[ind] = np.ones((size_im[0], size_im[1], gt_data.shape[2]))
-                self.dataAugmenation[ind] = True
+                self.weights = np.ones((self.size_im[0], self.size_im[1], self.size_im[2]))
+                self.dataAugmenation = True
             else:
-                self.weights[ind] = np.load('{}/{}'.format(self.rep, weight_name))
-                self.dataAugmenation[ind] = False
-
-            for i in range(gt_data.shape[2]):
-                self.mri3D[ind][:,:,i] = preprocessing_im(image_data[:,:,i])
-                self.mri3D[ind][:,:, i] -= np.min(self.mri3D[ind][:,:, i])
-                self.mri3D[ind][:,:, i] = self.mri3D[ind][:,:,i] / np.max(self.mri3D[ind][:,:,i]) * 1
-                self.gt3D[ind][:,:, i] = preprocessing_label(gt_data[:,:,i])
-
-        # randomization: seed and pick
-        if self.random:
-            random.seed(self.seed)
-            self.idx = np.random.choice(self.mri3D.keys())
-            self.indSlice =  np.random.randint(self.mri3D[self.idx].shape[2])
+                self.weights = np.load('{}/{}'.format(self.rep, weight_name))
+                self.dataAugmenation = False
 
 
     def reshape(self, bottom, top):
         # load image + label image pair
-        self.data = self.load_image(self.idx, self.indSlice)
-        self.label = self.load_label(self.idx, self.indSlice)
-        self.weight = self.weights[self.idx][:,:,self.indSlice]
+        self.data = self.load_image(self.idx)
+        self.label = self.load_label(self.idx)
+        self.weight = self.load_weight(self.idx)
 
-        if self.elasticTransform and self.dataAugmenation[self.idx]:
+        if self.elasticTransform and self.dataAugmenation:
             # im_merge = np.concatenate((self.data[...,None], self.label[...,None]), axis=2)
             # # Apply transformation on image
             # im_merge_t = elastic_transform(im_merge, im_merge.shape[1] * 2, im_merge.shape[1] * 0.08, im_merge.shape[1] * 0.08, random_state=None)
@@ -180,22 +160,55 @@ class RV_layer(caffe.Layer):
 
         # pick next input
         if self.random:
-            self.idx = np.random.choice(self.mri3D.keys())
-            self.indSlice =  np.random.randint(self.mri3D[self.idx].shape[2])
+            self.indSlice += 1
+            if self.indSlice >= self.mri3D.shape[2]:
+                self.idx = np.random.choice(self.indices)
+                split_line = self.idx.split("\t")
+                self.mri3D , _ = load(self.rep + "/" + split_line[0])
+
+                if ".npy" in split_line[1]:
+                    self.gt_data = np.load('{}/{}'.format(self.rep, split_line[1]))
+                else:
+                    self.gt_data, _ = load(self.rep + "/" + split_line[1])
+
+                weight_name = None
+                if len(split_line) > 2: # weight file specified
+                    weight_name = split_line[2]
+
+                self.size_im = self.mri3D.shape
+                if weight_name == None:
+                    self.weights = np.ones((self.size_im[0], self.size_im[1], self.size_im[2]))
+                    self.dataAugmenation = True
+                else:
+                    self.weights = np.load('{}/{}'.format(self.rep, weight_name))
+                    self.dataAugmenation = False
+
+                self.indSlice = 0
 
     def backward(self, top, propagate_down, bottom):
         pass
 
-    def load_image(self, idx, indSlice):
+    def load_image(self, idx):
         """
         Load input image
         """
         # Read all the the slices in the repertory
-        return self.mri3D[idx][:,:,indSlice]
 
 
-    def load_label(self, idx, indSlice):
+        im = preprocessing_im(self.mri3D[:,:,self.indSlice])
+        minimum = np.min(im)
+        im = (im - minimum) / (np.max(im)-minimum) * 1
+
+        return im
+
+
+    def load_label(self, idx):
         """
         Load label image 
         """
-        return self.gt3D[idx][:,:,indSlice]
+
+        return preprocessing_label(self.gt_data[:,:,self.indSlice])
+
+    def load_weight(self, idx):
+
+        return self.weights[:,:,self.indSlice]
