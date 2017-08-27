@@ -20,7 +20,7 @@ parser.add_argument('-d', '--directory',
             help="directory where to save the results")
 
 args = parser.parse_args()
-filenames_test = args.files
+filenames = args.files
 directorySave = args.directorySave
 rep_dataset = args.rep_dataset
 
@@ -35,7 +35,7 @@ net_deploy = caffe.Net(net_deploy_name,      # defines the structure of the mode
 
 hm3D = {}
 dice = []
-file_dataset = open(filenames_test)
+file_dataset = open(filenames)
 for patientfile in file_dataset.read().splitlines():
 	split_line = patientfile.split("\t")
 	inputs_name = split_line[0]
