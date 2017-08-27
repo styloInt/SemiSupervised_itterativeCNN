@@ -11,7 +11,7 @@ from medpy.io import load, header
 import numpy as np
 from scipy.ndimage.interpolation import map_coordinates
 from scipy.ndimage.filters import gaussian_filter
-from utils_dataRV import *
+from utils_dataSpine import *
 
 def elastic_transform(image, alpha, sigma, alpha_affine, random_state=None):
     """Elastic deformation of images as described in [Simard2003]_ (with modifications).
@@ -69,7 +69,7 @@ def data_augmentation(im, label):
 
 
 
-class RV_layer(caffe.Layer):
+class Spine_layer(caffe.Layer):
     """
     """
     def setup(self, bottom, top):

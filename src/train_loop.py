@@ -4,7 +4,7 @@
 import sys
 import re
 from config import *
-from utils_dataRV import *
+from utils_dataSpine import *
 import numpy as np
 from PIL import Image
 from shutil import copyfile
@@ -220,12 +220,12 @@ for num_epoch in range(epoch_start, number_epoch):
 		
 		predictions_test = hm3D_test[patientNum].argmax(2)
 
-		if postProc == "graphcut3D":
-			result3D_test[patientNum] = graphcut3D(mri3D_test[patientNum], hm3D_test[patientNum], lamda=lamda, sigma=sigma, pWeightMax=pWeightMax)
-		elif postProc == "noPost":
-			result3D_test[patientNum] = predictions_test.copy()
+		# if postProc == "graphcut3D":
+		# 	result3D_test[patientNum] = graphcut3D(mri3D_test[patientNum], hm3D_test[patientNum], lamda=lamda, sigma=sigma, pWeightMax=pWeightMax)
+		# elif postProc == "noPost":
+		# 	result3D_test[patientNum] = predictions_test.copy()
 
-		dice_patients_W_test[patientNum] = np.mean(compute_dice_dataset(gt3D_test[patientNum], result3D_test[patientNum], countBgImgs=True))
+		# dice_patients_W_test[patientNum] = np.mean(compute_dice_dataset(gt3D_test[patientNum], result3D_test[patientNum], countBgImgs=True))
 		dice_patients_Wo_test[patientNum] = np.mean(compute_dice_dataset(gt3D_test[patientNum], predictions_test, countBgImgs=True))
 
 	net_deploy = None
@@ -233,7 +233,7 @@ for num_epoch in range(epoch_start, number_epoch):
 
 	print ("\t\tMean dice CNN result {} ...".format(np.mean(dice_patients_Wo_test.values())))
 	print("\t \tSaving dice for the test images in {} ...".format(dice_saveUnlab_filename))
-	dice_saveTest_file.write(str(num_epoch) + " : " + str(dice_patients_W_test) + "\t" + str(dice_patients_Wo_test) + "\n")
+	dice_saveTest_file.write(str(num_epoch) + " : " + str(dice_patients_Wo_test) + "\t" + str(dice_patients_Wo_test) + "\n")
 	dice_saveTest_file.close()
 	dice_saveTest_file = open(dice_saveTest_filename, "a")
 

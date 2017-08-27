@@ -13,8 +13,9 @@ import caffe
 caffe.set_device(0)
 caffe.set_mode_gpu()
 
-rep_dataset = "/home/atemmar/Documents/Data/RV_Segmentation_volume/"
+rep_dataset = "/home/atemmar/Documents/Data/Ismael/"
 
+filenames_test = rep_dataset + "/test.txt"
 net_deploy_name = rep_dataset + '/src/models/U-net_v2/unet_deploy_vp.prototxt' # The deploy network
 
 nb_classes = 2
@@ -22,5 +23,4 @@ nb_classes = 2
 do_test = True
 
 
-# pretrainedModel = rep_dataset + "/src/models_pretrained/U-net_noNorm_v2/train_unet_rv_softmax_vp_iter_240000.caffemodel"
-pretrainedModel = rep_dataset + "/src/models_pretrained/U-net_full/train_unet_rv_softmax_iter_158000.caffemodel"
+pretrainedModel = rep_dataset + "/src/models_pretrained/U-net_noNorm_v2/train_unet_rv_softmax_vp_iter_240000.caffemodel"

@@ -13,11 +13,11 @@ import caffe
 caffe.set_device(0)
 caffe.set_mode_gpu()
 
-rep_dataset = "/home/atemmar/Documents/Data/RV_Segmentation_volume/"
-solver_name =  rep_dataset + "/src/models/U-net/solver_unet_softmax_full.prototxt"
+rep_dataset = "/home/atemmar/Documents/Data/Ismail/"
+solver_name =  rep_dataset + "/src/models/U-net/solver_unet_softmax.prototxt"
 
-filenames_validation = rep_dataset + "/"
-net_deploy_name = rep_dataset + '/src/models/U-net_v2/unet_deploy_vp.prototxt' # The deploy network
+filenames_validation = rep_dataset + "/valid.txt"
+net_deploy_name = rep_dataset + '/src/models/U-net/unet_deploy_vp.prototxt' # The deploy network
 
 nb_itteration = 200000
 nb_classes = 2
@@ -27,4 +27,4 @@ do_test = True
 
 usePretrainedModel = 1 # 0 if not, 1 if you want to restart the training from a solverstate file, 2 if you want to use a pretrained model (caffemodel file)
 # pretrainedModel = rep_dataset + "/src/models_pretrained/U-net_noNorm_v2/train_unet_rv_softmax_vp_iter_180000.caffemodel"
-pretrainedModel = "/home/atemmar/Documents/Data/RV_Segmentation_volume/src/models_pretrained/U-net_full/train_unet_rv_softmax_iter_88000.solverstate"
+pretrainedModel = "/home/atemmar/Documents/Data/Ismail/src/models_pretrained/U-net_crop_noNorm/train_unet_spine_softmax_vp_iter_4000.solverstate"
